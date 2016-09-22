@@ -1,8 +1,13 @@
 module Main exposing (..)
 
 import Html exposing (text, Html)
+import Html.App as App
+import Light
 
 
-main : Html msg
 main =
-    text "Hello World!"
+    App.beginnerProgram
+        { model = Light.init
+        , update = Light.update
+        , view = Light.view
+        }

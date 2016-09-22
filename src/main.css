@@ -1,3 +1,18 @@
 body {
   margin: 0;
 }
+
+.light-bulb {
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 10em;
+  margin: 1em;
+}
+
+.on {
+  background-color: yellow;
+}
+
+.off {
+  background-color: grey;
+}
