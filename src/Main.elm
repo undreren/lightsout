@@ -1,13 +1,13 @@
 module Main exposing (..)
 
-import Html exposing (text, Html)
 import Html.App as App
-import Board
+import Game
 
 
 main =
-    App.beginnerProgram
-        { model = Board.init 10 10
-        , update = Board.update
-        , view = Board.view
+    App.program
+        { init = Game.init
+        , update = Game.update
+        , view = Game.view
+        , subscriptions = Game.subscriptions
         }
