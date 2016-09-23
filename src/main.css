@@ -6,7 +6,17 @@ body {
   width: 2.5em;
   height: 2.5em;
   border-radius: 10em;
-  margin: 1em;
+  margin: 0.2em;
+  display: inline-block;
+  border-style: solid;
+  border-width: 0.2em;
+  border-color: grey;
+
+  -webkit-transition: background-color 300ms linear;
+  -moz-transition: background-color 300ms linear;
+  -o-transition: background-color 300ms linear;
+  -ms-transition: background-color 300ms linear;
+  transition: background-color 300ms linear;
 }
 
 .on {
@@ -14,5 +24,18 @@ body {
 }
 
 .off {
-  background-color: grey;
+  background-color: black;
+}
+
+.light-row {
+
+}
+
+.board {
+  background-color: darkgrey;
+  padding: 1em;
+  border-radius: 1em;
+  display: inline-block;
+  text-align: center;
+  line-height: 0;
 }

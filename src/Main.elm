@@ -2,12 +2,12 @@ module Main exposing (..)
 
 import Html exposing (text, Html)
 import Html.App as App
-import Light
+import Board
 
 
 main =
     App.beginnerProgram
-        { model = Light.init
-        , update = Light.update
-        , view = Light.view
+        { model = Board.init 10 10
+        , update = Board.update
+        , view = Board.view
         }
