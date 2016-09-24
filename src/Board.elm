@@ -2,8 +2,7 @@ module Board exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.App as App
-import Light exposing (Msg(..))
+import Light
 
 
 --MODEL
@@ -20,7 +19,7 @@ init : Int -> Int -> Model
 init cols rows =
     { cols = cols
     , rows = rows
-    , lights = List.repeat rows << List.repeat cols <| Light.init
+    , lights = List.repeat rows << List.repeat cols <| Light.init Light.Off
     }
 
 
@@ -49,7 +48,7 @@ click r c lights =
                         ((r' == r) && (List.member c' [c - 1..c + 1]))
                             || ((c' == c) && (List.member r' [r - 1..r + 1]))
                     then
-                        Light.update Switch light
+                        Light.update Light.Switch light
                     else
                         light
 
@@ -72,4 +71,4 @@ viewRow r lights =
 
 viewSingleLight : Int -> Int -> Light.Model -> Html Msg
 viewSingleLight r c light =
-    App.map (\_ -> Click ( r, c )) (Light.view light)
+    Light.view (Click ( r, c )) light

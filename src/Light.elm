@@ -27,9 +27,9 @@ type alias Model =
     { state : LightState }
 
 
-init : Model
-init =
-    { state = Off }
+init : LightState -> Model
+init state =
+    { state = state }
 
 
 
@@ -55,12 +55,12 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html Msg
-view model =
-    div [ lightClass model, onClick Switch ] []
+view : msg -> Model -> Html msg
+view msg model =
+    div [ lightClass model, onClick msg ] []
 
 
-lightClass : Model -> Attribute Msg
+lightClass : Model -> Attribute msg
 lightClass model =
     case model.state of
         On ->
