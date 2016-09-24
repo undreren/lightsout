@@ -37,17 +37,12 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Click ( c, r ) ->
-            click ( c, r ) model
-
-
-click : ( Int, Int ) -> Model -> Model
-click ( c, r ) model =
-    model
-        |> switchLight ( c, r )
-        |> switchLight ( c + 1, r )
-        |> switchLight ( c - 1, r )
-        |> switchLight ( c, r + 1 )
-        |> switchLight ( c, r - 1 )
+            model
+                |> switchLight ( c, r )
+                |> switchLight ( c + 1, r )
+                |> switchLight ( c - 1, r )
+                |> switchLight ( c, r + 1 )
+                |> switchLight ( c, r - 1 )
 
 
 switchLight : ( Int, Int ) -> Model -> Model
