@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Light
 import Table exposing (Table)
+import Helpers exposing (transpose)
 
 
 --MODEL
@@ -64,23 +65,6 @@ view model =
         List.indexedMap viewRow <|
             transpose <|
                 Table.toList model.lights
-
-
-transpose : List (List a) -> List (List a)
-transpose xs =
-    case xs of
-        [] ->
-            []
-
-        _ ->
-            let
-                heads =
-                    List.filterMap List.head xs
-
-                tails =
-                    List.filterMap List.tail xs
-            in
-                heads :: transpose tails
 
 
 viewRow : Int -> List Light.Model -> Html Msg
