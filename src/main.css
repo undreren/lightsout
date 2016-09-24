@@ -47,8 +47,3 @@ body {
 .game-box > h1 {
   font: 3em arial, sans-serif;
 }
-
-div.score-box {
-  width: 50%;
-  display: inline-block;
-}
