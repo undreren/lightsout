@@ -81,5 +81,5 @@ view model =
         , br [] []
         , text <| "Moves: " ++ toString model.moves
         , br [] []
-        , text <| "Time: " ++ toString (Time.inSeconds model.elapsedTime)
+        , text <| "Time: " ++ toString (floor << Time.inSeconds <| model.elapsedTime)
         ]

@@ -39,3 +39,16 @@ body {
   text-align: center;
   line-height: 0;
 }
+
+.game-box {
+  text-align: center;
+}
+
+.game-box > h1 {
+  font: 3em arial, sans-serif;
+}
+
+div.score-box {
+  width: 50%;
+  display: inline-block;
+}
