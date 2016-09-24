@@ -3,6 +3,7 @@ module Board exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Light
+import Table exposing (Table)
 
 
 --MODEL
@@ -11,7 +12,7 @@ import Light
 type alias Model =
     { cols : Int
     , rows : Int
-    , lights : List (List Light.Model)
+    , lights : Table Light.Model
     }
 
 
@@ -19,7 +20,7 @@ init : Int -> Int -> Model
 init cols rows =
     { cols = cols
     , rows = rows
-    , lights = List.repeat rows << List.repeat cols <| Light.init Light.Off
+    , lights = Table.initialize cols rows (Light.init Light.Off)
     }
 
 
@@ -34,23 +35,23 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Click ( r, c ) ->
-            { model | lights = click r c model.lights }
+        Click ( c, r ) ->
+            click ( c, r ) model
 
 
-click : Int -> Int -> List (List Light.Model) -> List (List Light.Model)
-click r c lights =
-    flip List.indexedMap lights <|
-        \r' row ->
-            flip List.indexedMap row <|
-                \c' light ->
-                    if
-                        ((r' == r) && (List.member c' [c - 1..c + 1]))
-                            || ((c' == c) && (List.member r' [r - 1..r + 1]))
-                    then
-                        Light.update Light.Switch light
-                    else
-                        light
+click : ( Int, Int ) -> Model -> Model
+click ( c, r ) model =
+    model
+        |> switchLight ( c, r )
+        |> switchLight ( c + 1, r )
+        |> switchLight ( c - 1, r )
+        |> switchLight ( c, r + 1 )
+        |> switchLight ( c, r - 1 )
+
+
+switchLight : ( Int, Int ) -> Model -> Model
+switchLight ( c, r ) model =
+    { model | lights = Table.modify ( c, r ) (Light.update Light.Switch) model.lights }
 
 
 
@@ -60,15 +61,34 @@ click r c lights =
 view : Model -> Html Msg
 view model =
     div [ class "board" ] <|
-        List.indexedMap viewRow model.lights
+        List.indexedMap viewRow <|
+            transpose <|
+                Table.toList model.lights
+
+
+transpose : List (List a) -> List (List a)
+transpose xs =
+    case xs of
+        [] ->
+            []
+
+        _ ->
+            let
+                heads =
+                    List.filterMap List.head xs
+
+                tails =
+                    List.filterMap List.tail xs
+            in
+                heads :: transpose tails
 
 
 viewRow : Int -> List Light.Model -> Html Msg
 viewRow r lights =
     div [ class "light-row" ] <|
-        List.indexedMap (viewSingleLight r) lights
+        List.indexedMap (flip viewSingleLight r) lights
 
 
 viewSingleLight : Int -> Int -> Light.Model -> Html Msg
-viewSingleLight r c light =
-    Light.view (Click ( r, c )) light
+viewSingleLight c r light =
+    Light.view (Click ( c, r )) light
