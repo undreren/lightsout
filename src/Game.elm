@@ -13,7 +13,6 @@ import Task
 
 type alias Model =
     { board : Board.Model
-    , moves : Int
     , startTime : Time
     , elapsedTime : Time
     }
@@ -22,11 +21,13 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( { board = Board.init 10 10
-      , moves = 0
       , startTime = 0
       , elapsedTime = 0
       }
-    , Task.perform SetStartTime SetStartTime Time.now
+    , Cmd.batch
+        [ Task.perform SetStartTime SetStartTime Time.now
+        , Cmd.map (BoardMsg) (Board.randomizeBoard 10 10 0.15
+        ]
     )
 
 
@@ -44,12 +45,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         BoardMsg bMsg ->
-            ( { model
-                | board = Board.update bMsg model.board
-                , moves = model.moves + 1
-              }
-            , Cmd.none
-            )
+            { model | board = Board.update bMsg model.board } ! []
 
         Tick t ->
             ( { model | elapsedTime = t - model.startTime }
@@ -79,7 +75,7 @@ view model =
         [ h1 [] [ text "Lights Out" ]
         , App.map BoardMsg (Board.view model.board)
         , br [] []
-        , text <| "Moves: " ++ toString model.moves
+        , text <| "Moves: " ++ toString model.board.moves
         , br [] []
         , text <| "Time: " ++ toString (floor << Time.inSeconds <| model.elapsedTime)
         ]
