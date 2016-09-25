@@ -34,6 +34,7 @@ init cols rows =
 
 type Msg
     = Click Bool ( Int, Int )
+    | ResetMoves
     | BatchClick (List ( Int, Int ))
 
 
@@ -53,6 +54,9 @@ update msg model =
                 |> switchLight ( c - 1, r )
                 |> switchLight ( c, r + 1 )
                 |> switchLight ( c, r - 1 )
+
+        ResetMoves ->
+            { model | moves = 0 }
 
         BatchClick indices ->
             List.foldl (\idx m -> update (Click False idx) m) model indices
