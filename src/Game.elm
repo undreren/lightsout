@@ -26,7 +26,7 @@ init =
       }
     , Cmd.batch
         [ Task.perform SetStartTime SetStartTime Time.now
-        , Cmd.map (BoardMsg) (Board.randomizeBoard 10 10 0.15
+        , Cmd.map (BoardMsg) (Board.randomizeBoard 10 10 0.15)
         ]
     )
 
