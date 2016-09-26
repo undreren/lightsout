@@ -19,18 +19,18 @@ transpose xs =
 
 
 zip : List a -> List b -> List ( a, b )
-zip xs ys =
-    case xs of
-        [] ->
+zip =
+    zipWith (,)
+
+
+zipWith : (a -> b -> c) -> List a -> List b -> List c
+zipWith f xs ys =
+    case ( xs, ys ) of
+        ( x :: xs', y :: ys' ) ->
+            f x y :: zipWith f xs' ys'
+
+        _ ->
             []
-
-        x :: xs' ->
-            case ys of
-                [] ->
-                    []
-
-                y :: ys' ->
-                    ( x, y ) :: zip xs' ys'
 
 
 allIndices : Int -> Int -> List ( Int, Int )
