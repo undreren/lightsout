@@ -1,41 +1,28 @@
 module Game exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
 import Html.Attributes exposing (class)
 import Html.App as App
-import Board
 import Time exposing (Time)
-import Task
+import Level
 
 
 --MODEL
 
 
+type alias Level =
+    Level.Model
+
+
 type alias Model =
-    { board : Board.Model
-    , memo : Board.Model
-    , startTime : Time
-    , elapsedTime : Time
+    { level : Level
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    let
-        board =
-            Board.init 7 7
-    in
-        ( { board = board
-          , memo = board
-          , startTime = 0
-          , elapsedTime = 0
-          }
-        , Cmd.batch
-            [ Task.perform SetStartTime SetStartTime Time.now
-            , Task.perform identity identity (Task.succeed NewBoard)
-            ]
-        )
+init : Int -> Int -> Model
+init cols rows =
+    { level = Level.init cols rows 0
+    }
 
 
 
@@ -43,49 +30,18 @@ init =
 
 
 type Msg
-    = BoardMsg Board.Msg
-    | NewBoard
-    | MemoBoard
-    | RevertBoard
+    = LevelMsg Level.Msg
     | Tick Time
-    | AndThen Msg Msg
-    | SetStartTime Time
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
-        BoardMsg bMsg ->
-            { model | board = Board.update bMsg model.board } ! []
+        LevelMsg lMsg ->
+            { model | level = Level.update lMsg model.level }
 
         Tick t ->
-            { model | elapsedTime = t - model.startTime } ! []
-
-        SetStartTime t ->
-            { model | startTime = t } ! []
-
-        NewBoard ->
-            model
-                ! [ Cmd.map (\msg -> AndThen (BoardMsg msg) MemoBoard)
-                        (Board.randomizeBoard 7 7 0.07)
-                  ]
-
-        RevertBoard ->
-            { model | board = Board.update Board.ResetMoves model.memo }
-                ! [ Task.perform SetStartTime SetStartTime Time.now ]
-
-        MemoBoard ->
-            { model | memo = model.board } ! []
-
-        AndThen msg1 msg2 ->
-            let
-                ( model', cmd1 ) =
-                    update msg1 model
-
-                ( model'', cmd2 ) =
-                    update msg2 model'
-            in
-                model'' ! [ cmd1, cmd2 ]
+            { model | level = Level.update (Level.Tick t) model.level }
 
 
 
@@ -105,12 +61,9 @@ view : Model -> Html Msg
 view model =
     div [ class "game-box" ]
         [ h1 [] [ text "Lights Out" ]
-        , App.map BoardMsg (Board.view model.board)
+        , App.map LevelMsg (Level.view model.level)
         , br [] []
-        , text <| "Moves: " ++ toString model.board.moves
+        , text <| "Moves: " ++ toString (List.length model.level.history)
         , br [] []
-        , text <| "Time: " ++ toString (floor << Time.inSeconds <| model.elapsedTime)
-        , br [] []
-        , button [ onClick RevertBoard ] [ text "Retry" ]
-        , button [ onClick NewBoard ] [ text "New" ]
+        , text <| "Time: " ++ toString (floor << Time.inSeconds <| model.level.elapsedTime)
         ]
