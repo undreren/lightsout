@@ -54,10 +54,10 @@ update msg model =
 
 
 switchLight : ( Int, Int ) -> Model -> Model
-switchLight ( c, r ) model =
+switchLight idx model =
     { model
         | lights =
-            Table.modify ( c, r ) (Light.update Light.Switch) model.lights
+            Table.modify idx (Light.update Light.Switch) model.lights
     }
 
 
