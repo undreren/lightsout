@@ -24,7 +24,7 @@ init : ( Model, Cmd Msg )
 init =
     let
         board =
-            Board.init 10 10
+            Board.init 7 7
     in
         ( { board = board
           , memo = board
@@ -67,7 +67,7 @@ update msg model =
         NewBoard ->
             model
                 ! [ Cmd.map (\msg -> AndThen (BoardMsg msg) MemoBoard)
-                        (Board.randomizeBoard 10 10 0.15)
+                        (Board.randomizeBoard 7 7 0.07)
                   ]
 
         RevertBoard ->
