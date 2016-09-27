@@ -35,6 +35,6 @@ zipWith f xs ys =
 
 allIndices : Int -> Int -> List ( Int, Int )
 allIndices cols rows =
-    List.concat <|
-        List.indexedMap (\i row -> List.map ((,) i) row) <|
-            List.repeat cols [0..rows - 1]
+    List.repeat rows [0..cols - 1]
+        |> List.indexedMap (\i xs -> List.map ((,) i) xs)
+        |> List.concat
