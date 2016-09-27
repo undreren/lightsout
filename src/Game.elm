@@ -1,6 +1,6 @@
-module Game exposing (..)
+module Game exposing (Model, init, Msg(..), update, view, subscriptions)
 
-import Html exposing (..)
+import Html exposing (Html, div, text, br, h1)
 import Html.Attributes exposing (class)
 import Html.App as App
 import Time exposing (Time)

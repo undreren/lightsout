@@ -1,8 +1,8 @@
-module Light exposing (..)
+module Light exposing (LightState(..), Model, init, Msg(..), update, view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, Attribute, div)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 
 
 -- MODEL

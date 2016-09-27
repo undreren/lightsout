@@ -1,7 +1,7 @@
 module Board exposing (Model, init, Msg(..), update, view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, Attribute, div)
+import Html.Attributes exposing (class)
 import Light exposing (Model, LightState(..))
 import Table exposing (Table)
 import Helpers exposing (transpose, zip, allIndices)
