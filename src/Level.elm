@@ -100,6 +100,7 @@ boardMsg msg model =
             { model
                 | board = Board.update msg model.board
                 , history = model.board :: model.history
+                , future = []
             }
 
 
