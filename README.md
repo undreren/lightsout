@@ -2,4 +2,22 @@
 
 A small puzzle game, implemented in Elm!
 
+### Object of the game ###
+
+To complete a level you must turn off all the lights, but that can be harder than it sounds.
+
+When you click a light, it turns on or off, depending on its current state. But so does its neighbors!
+
+There are currently no levels, so all lights are turned on by default. 
+
 [Try it out!](https://undreren.github.io/lightsout)
+
+Have fun!
+
+### TODO ###
+
+- Msg NewGame should use the random seed on Game.Model, and generate a new seed
+- Add tailored levels.
+- Make ports to save local state
+- Implement achievements
+- Add background music and sounds
