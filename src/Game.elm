@@ -14,6 +14,12 @@ type alias Level =
     Level.Model
 
 
+type View
+    = GameView
+    | MainMenu
+    | Pause
+
+
 type alias Model =
     { level : Level
     }
