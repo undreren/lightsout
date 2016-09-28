@@ -29,7 +29,7 @@ init : Int -> Int -> Model
 init cols rows =
     { cols = cols
     , rows = rows
-    , lights = Table.initialize cols rows (Light.init Off)
+    , lights = Table.initialize cols rows (Light.init On)
     }
 
 
