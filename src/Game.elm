@@ -5,12 +5,16 @@ import Html.Events exposing (onClick)
 import Html.Attributes exposing (class)
 import Html.App as App
 import Time exposing (Time)
-import Random exposing (Seed)
+import Random exposing (Seed, int, initialSeed, generate, minInt, maxInt)
 import Level
 import Menu
 
 
 -- SYNONYMS
+
+
+type alias View =
+    Model -> Html Msg
 
 
 type alias Level =
@@ -25,30 +29,24 @@ type alias Menu a =
 --MODEL
 
 
-type View
-    = GameView
-    | MainMenu
+type Model
+    = Model
+        { level : Maybe Level
+        , currentView : View
+        , seed : Seed
+        }
 
 
-type alias Model =
-    { level : Level
-    , mainMenu : Menu Msg
-    , currentView : View
-    , levelSeed : Seed
-    }
-
-
-init : Int -> Int -> Int -> Model
-init cols rows seed =
-    { level = Level.init cols rows 0
-    , levelSeed = Random.initialSeed seed
-    , currentView = MainMenu
-    , mainMenu =
-        Menu.init
-            [ ( "New Game", NewGame )
-            , ( "Resume Game", Switch GameView )
-            ]
-    }
+init : ( Model, Cmd Msg )
+init =
+    Model
+        { level = Nothing
+        , seed = initialSeed 0
+        , currentView = mainMenuView
+        }
+        ! [ int minInt maxInt
+                |> generate (SetSeed << initialSeed)
+          ]
 
 
 
@@ -57,31 +55,65 @@ init cols rows seed =
 
 type Msg
     = LevelMsg Level.Msg
+    | SwitchView View
     | Tick Time
-    | Switch View
     | NewGame
+    | GoToMenu
+    | GoToLevel Level
+    | SetSeed Seed
 
 
 update : Msg -> Model -> Model
-update msg model =
+update msg (Model model) =
     case msg of
         LevelMsg lMsg ->
-            { model | level = Level.update lMsg model.level }
+            case model.level of
+                Nothing ->
+                    Model model
+
+                Just level ->
+                    let
+                        newLevel =
+                            Level.update lMsg level
+                    in
+                        Model
+                            { model
+                                | level = Just newLevel
+                                , currentView = gameView newLevel
+                            }
 
         Tick t ->
-            { model | level = Level.update (Level.Tick t) model.level }
+            if Maybe.withDefault True <| Maybe.map (.paused) model.level then
+                Model model
+            else
+                update (LevelMsg <| Level.Tick t) (Model model)
 
-        Switch view ->
-            { model | currentView = view }
+        SwitchView newView ->
+            Model { model | currentView = newView }
+
+        SetSeed seed ->
+            Model { model | seed = seed }
+
+        GoToMenu ->
+            Model
+                { model
+                    | level = Maybe.map (Level.update (Level.Paused True)) model.level
+                    , currentView = mainMenuView
+                }
+
+        GoToLevel level ->
+            Model
+                { model
+                    | level = Just <| Level.update (Level.Paused False) level
+                    , currentView = gameView level
+                }
 
         NewGame ->
             let
                 newLevel =
-                    Level.init (model.level.board.cols)
-                        (model.level.board.rows)
-                        0
+                    Level.init 7 7 0
             in
-                { model | level = newLevel, currentView = GameView }
+                update (GoToLevel newLevel) (Model model)
 
 
 
@@ -90,7 +122,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every (10 * Time.millisecond) Tick
+    Time.every (Time.second / 60) Tick
 
 
 
@@ -98,25 +130,20 @@ subscriptions model =
 
 
 view : Model -> Html Msg
-view model =
-    case model.currentView of
-        GameView ->
-            gameView model
-
-        MainMenu ->
-            mainMenuView model
+view (Model model) =
+    model.currentView (Model model)
 
 
-gameView : Model -> Html Msg
-gameView model =
+gameView : Level -> Model -> Html Msg
+gameView level (Model model) =
     div [ class "game-box" ]
         [ h1 [] [ text "Lights Out" ]
-        , button [ onClick (Switch MainMenu) ] [ text "Main Menu" ]
-        , App.map LevelMsg (Level.view model.level)
+        , button [ onClick GoToMenu ] [ text "Main Menu" ]
+        , App.map LevelMsg (Level.view level)
         , br [] []
-        , text <| "Moves: " ++ toString (List.length model.level.history)
+        , text <| "Moves: " ++ toString (List.length level.history)
         , br [] []
-        , text <| "Time: " ++ toString (floor << Time.inSeconds <| model.level.elapsedTime)
+        , text <| "Time: " ++ toString (floor << Time.inSeconds <| level.elapsedTime)
         ]
 
 
@@ -124,5 +151,31 @@ mainMenuView : Model -> Html Msg
 mainMenuView model =
     div [ class "game-box" ]
         [ h1 [] [ text "Lights Out" ]
-        , Menu.view model.mainMenu
+        , generateMenu model
         ]
+
+
+generateMenu : Model -> Html Msg
+generateMenu (Model model) =
+    case model.level of
+        Just level ->
+            menuWithResume level (Model model)
+
+        Nothing ->
+            menuWithOutResume (Model model)
+
+
+menuWithResume : Level -> Model -> Html Msg
+menuWithResume level (Model model) =
+    Menu.view <|
+        Menu.init
+            [ ( "New Game", NewGame )
+            , ( "Resume", GoToLevel level )
+            ]
+
+
+menuWithOutResume : Model -> Html Msg
+menuWithOutResume _ =
+    Menu.view <|
+        Menu.init
+            [ ( "New Game", NewGame ) ]
