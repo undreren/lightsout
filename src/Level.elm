@@ -25,7 +25,6 @@ type alias Model =
     , future : List Board.Model
     , paused : Bool
     , startTime : Time
-    , elapsedTime : Time
     }
 
 
@@ -36,7 +35,6 @@ init cols rows time =
     , history = []
     , future = []
     , startTime = time
-    , elapsedTime = 0
     }
 
 
@@ -49,7 +47,6 @@ type Msg
     | Paused Bool
     | Undo
     | Redo
-    | Tick Time
 
 
 update : Msg -> Model -> Model
@@ -63,12 +60,6 @@ update msg model =
 
         Redo ->
             redo model
-
-        Tick t ->
-            if model.paused then
-                model
-            else
-                { model | elapsedTime = t - model.startTime }
 
         Paused b ->
             { model | paused = b }
